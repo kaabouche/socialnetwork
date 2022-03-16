@@ -1,0 +1,17 @@
+<div class="col-12">
+    <div class="empty-newsfeed">
+        <div class="empty-newsfeed-icon">
+            <i class="fa-regular fa-comment-lines"></i>
+        </div>
+        <div class="empty-newsfeed-text">
+            <h4>No posts yet</h4>
+            {% if request.user.username == user.username %}
+                <p>
+                    Your timeline is empty. Let's change that!
+                    <br>
+                    Share what's on your mind to fill it up!
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>

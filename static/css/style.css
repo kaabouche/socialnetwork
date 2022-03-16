@@ -1,0 +1,395 @@
+.index-p {
+    font-size: 1.6rem;
+    color: #000;
+    line-height: 1.4;
+    margin: 0 0 10px;
+}
+
+.index-body {
+    background-color: #f0f2f5;
+}
+
+.index-row {
+    margin-top: 10rem;
+}
+
+.index-footer {
+    background-color: #ffffff;
+    padding: 6rem 0;
+}
+
+.index-footer a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.index-footer a:hover {
+    color: #0d6efd;
+}
+
+.new-account {
+    background-color: #42b72a;
+    color: #ffffff;
+}
+
+.new-account:hover {
+    background-color: #36a420;
+    color: #ffffff;
+}
+
+.modal-muted {
+    color: #000;
+    font-size: 1rem;
+}
+
+.login-form {
+    background-color: #ffffff;
+    padding: 6rem 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border-radius: .5rem;
+}
+
+.home-search {
+    text-align: center;
+}
+
+.home-col {
+    padding-top: 4rem;
+}
+
+.panel-bg {
+    background-color: #ffffff;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.panel-bg-top {
+    background-color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.user-feed-panel {
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+}
+
+.my-btn {
+    background-color: transparent;
+    border-color: transparent;
+    color: #929292;
+    padding: 9px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.my-btn:hover {
+    color: #000000;
+}
+
+.post-profile-photo {
+    margin: 1rem;
+    max-width: 75px;
+    max-height: 75px;
+}
+
+.pull-right {
+    float: right;
+    margin-right: 1rem;
+    top: 0;
+}
+
+.post-actions a {
+    text-decoration: none;
+}
+
+.post-actions-active {
+    color: #0d6efd;
+}
+
+.post-actions a:hover {
+    color: #0d6efd !important;
+}
+
+.post-actions-active {
+    color: #0d6efd !important;
+}
+
+.post-actions-active:hover {
+    color: #6c757d !important;
+}
+
+.username {
+    font-size: 1.1rem;
+    font-weight: 550;
+    text-decoration: none;
+}
+
+.username:hover {
+    text-decoration: underline;
+}
+
+.post-time:hover {
+    text-decoration: underline;
+}
+
+.empty-newsfeed {
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-newsfeed-icon {
+    font-size: 2.5rem;
+    color: #929292;
+}
+
+.empty-newsfeed-text {
+    font-size: 1.2rem;
+    color: #929292;
+}
+
+.profile-panel {
+    background-color: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border-radius: .5rem;
+}
+
+.profile-cover {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.profile-cover-img {
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.profile-cover-bg {
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 500px;
+}
+
+/* profile-cover-buttons top right of the image */
+.profile-cover-buttons {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem;
+}
+
+.profile-picture {
+    margin: 1rem;
+    max-width: 200px;
+    max-height: 200px;
+    /* float on cover */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transform: translate(50%, 50%);
+    cursor: pointer;
+}
+
+.profile-picture:hover .profile-picture-overlay {
+    transition: all 0.2s ease-in-out;
+    opacity: 1;
+}
+
+.profile-picture img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    /* white thicc border */
+    border: 3px solid #ffffff;
+}
+
+.profile-picture-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    border-radius: 50%;
+    /* white thicc border */
+    border: 3px solid #ffffff;
+    opacity: 0;
+}
+
+.profile-picture-buttons {
+    position: absolute;
+    /* center on img */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.profile-info {
+    padding: 1rem 0 0.2rem 0;
+    text-align: center;
+}
+
+.post-image-field {
+    padding: 0 1.5rem 1rem 0.5rem;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.friend-list {
+    padding: 1rem 0 0.2rem 0;
+}
+
+.friend-list-item {
+    background-color: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border-radius: .5rem;
+    margin-bottom: 1rem;
+}
+
+.friend-list-item-img {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.friend-list-item-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    /* white thicc border */
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+    cursor: pointer;
+}
+
+.friend-list-item-info {
+    padding: 1rem;
+}
+
+.friend-list-item-action {
+    padding: 1rem;
+    text-align: right;
+}
+
+.no-friends {
+    text-align: center;
+    padding: 2rem;
+}
+
+.no-friends-img {
+    font-size: 2.5rem;
+    color: #929292;
+}
+
+.no-friends-text {
+    font-size: 1.2rem;
+    color: #929292;
+}
+
+.message-panel {
+    background-color: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border-radius: .5rem;
+    margin-bottom: 0.5rem;
+}
+
+.sender-profile-picture {
+    margin: 1rem;
+    max-width: 150px;
+    max-height: 150px;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+    cursor: pointer;
+}
+
+.message-more:hover {
+    color: #35383b !important;
+}
+
+/* vetically center the text */
+.sender-details {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.senders-message {
+    margin-left: 1rem;
+    padding: 1rem;
+    border-radius: .5rem;
+    background-color: #0d6efd;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+.receivers-message {
+    margin-right: 1rem;
+    padding: 1rem;
+    border-radius: .5rem;
+    background-color: #f1f0f0;
+    color: #000000;
+    margin-bottom: 1rem;
+}
+
+.light-brand {
+    color: #0d6efd !important;
+    font-weight: bold;
+}
+
+.about-panel {
+    background-color: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border-radius: .5rem;
+    margin-bottom: 0.5rem;
+}
+
+.panel-title {
+    font-size: 1.2rem;
+    font-weight: 550;
+    text-decoration: none;
+}
+
+.about-info-panel {
+    padding: 1rem;
+}
+
+.search-panel {
+    background-color: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    border-radius: .5rem;
+    margin-bottom: 0.5rem;
+}
+
+.search-panel-title {
+    font-size: 1.2rem;
+    font-weight: 550;
+    text-decoration: none;
+}
+
+.no-results {
+    text-align: center;
+    padding: 2rem;
+}
+
+.no-result-img {
+    font-size: 2.5rem;
+    color: #929292;
+}
+
+.no-decoration {
+    text-decoration: none;
+}
+
+.no-decoration:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load post_functions %}
+{% block title %}Search for {{ request.GET.q }} | {% endblock %}
+
+{% block content %}
+    <div class="container-fluid search-panel panel-bg">
+        <div class="row">
+            <div class="col-12">
+                <div class="search-panel-title">
+                    <h3>Search for <i>{{ request.GET.q }}</i></h3>
+                </div>
+                <hr>
+            </div>
+        </div>
+        {% for result in results %}
+            <div class="row my-4">
+                <div class="friend-list-item-img col-sm-2">
+                    <a href="{% url 'userprofile' result.username %}">
+                        <img src="{{ result.profile.profile_pic.url }}" alt="friend">
+                    </a>
+                </div>
+                <div class="friend-list-item-info col-sm-5">
+                    <h4>
+                        <a class="text-body no-decoration" href="{% url 'userprofile' result.username %}">
+                            {{ result.profile.get_full_name }}
+                        </a>
+                    </h4>
+                    <small><i class="fa-light fa-at"></i>{{ result.username }}</small>
+                    <p class="small text-muted mt-1">{{ result.profile.get_friends_count }} friends</p>
+                </div>
+                {% if result.username != request.user.username %}
+                    {% is_friend request.user.profile result as isfrnd %}
+                    {% is_friend_request request.user result as reqsent %}
+                    <div class="dropdown friend-list-item-action col-sm-5 d-none d-md-block d-lg-none">
+                        <button class="btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton{{ result.id }}"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-light fa-ellipsis-h"></i>
+                        </button>
+                        <ul id="uadd{{ result.id }}" class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ result.id }}">
+                            {% if isfrnd %}
+                                <li id="uadd_uf{{ result.id }}"><a class="dropdown-item" href="#">Unfriend</a></li>
+                            {% elif result.username in friend_requests_usernames %}
+                                <li id="uadd_ar{{ result.id }}"><a class="dropdown-item" href="#">Accept Request</a></li>
+                            {% elif not isfrnd %}
+                                <li id="uadd_af{{ result.id }}"><a class="dropdown-item" href="#">Add Friend</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="javascript:new_message('{{ result.username }})">Message</a></li>
+                        </ul>
+                    </div>
+                    <div id="ua{{ result.id }}" class="friend-list-item-action col-sm-5 d-md-none d-lg-block">
+                        {% if isfrnd %}
+                            <button id="ua_uf{{ result.id }}" class="btn btn-outline-danger" onclick="remove_friend('{{ result.username }}', {{ result.id }})">Unfriend</button>
+                        {% elif result.username in friend_requests_usernames %}
+                            <button id="ua_ar{{ result.id }}" class="btn btn-outline-primary" onclick="accept_request('{{ result.username }}', {{ result.id }})">Accept Request</button>
+                        {% elif reqsent %}
+                            <button id="ua_rr{{ result.id }}" class="btn btn-primary" onclick="revoke_request('{{ result.username }}', {{ result.id }})">Revoke Request</button>
+                        {% elif not isfrnd %}
+                            <button id="ua_af{{ result.id }}" class="btn btn-outline-primary" onclick="add_friend('{{ result.username }}', {{ result.id }})">Add Friend</button>
+                        {% endif %}
+                        <button class="btn btn-outline-dark" onclick="new_message('{{ result.username }}')">Message</button>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            {% include 'empty/empty_search.html' %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block script %}
+    // remove friend
+    function remove_friend(username, result_id) {
+        $.ajax({
+            url: '{% url 'search' %}',
+            type: 'POST',
+            data: {
+                'action': 'remove_friend',
+                'username': username,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.status === 'success') {
+                    $('#uadd_uf' + result_id).remove();
+                    $('#ua_uf' + result_id).remove();
+                    btn = $('<button>', {
+                        class: 'btn btn-outline-primary',
+                        text: 'Add Friend',
+                        id: 'ua_af' + result_id,
+                        onclick: 'add_friend(\'' + username + '\', ' + result_id + ')'
+                    });
+                    // append btn to ua
+                    $('#ua' + result_id).prepend(btn);
+                }
+            }
+        });
+    }
+    // add friend
+    function add_friend(username, result_id) {
+        $.ajax({
+            url: '{% url 'search' %}',
+            type: 'POST',
+            data: {
+                'action': 'add_friend',
+                'username': username,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.status === 'success') {
+                    $('#uadd_af' + result_id).remove();
+                    $('#ua_af' + result_id).remove();
+                    // revoke request
+                    btn = $('<button>', {
+                        class: 'btn btn-primary',
+                        text: 'Revoke Request',
+                        id: 'ua_rr' + result_id,
+                        onclick: 'revoke_request(\'' + username + '\', ' + result_id + ')'
+                    });
+                    // append btn to ua
+                    $('#ua' + result_id).prepend(btn);
+                }
+            }
+        });
+    }
+    // revoke request
+    function revoke_request(username, result_id) {
+        $.ajax({
+            url: '{% url 'search' %}',
+            type: 'POST',
+            data: {
+                'action': 'revoke_request',
+                'username': username,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.status === 'success') {
+                    $('#uadd_rr' + result_id).remove();
+                    $('#ua_rr' + result_id).remove();
+                    // add friend
+                    btn = $('<button>', {
+                        class: 'btn btn-outline-primary',
+                        text: 'Add Friend',
+                        id: 'ua_af' + result_id,
+                        onclick: 'add_friend(\'' + username + '\', ' + result_id + ')'
+                    });
+                    // append btn to ua
+                    $('#ua' + result_id).prepend(btn);
+                }
+            }
+        });
+    }
+    // accept request
+    function accept_request(username, result_id) {
+        $.ajax({
+            url: '{% url 'search' %}',
+            type: 'POST',
+            data: {
+                'action': 'accept_request',
+                'username': username,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.status === 'success') {
+                    $('#uadd_ar' + result_id).remove();
+                    $('#ua_ar' + result_id).remove();
+                    // unfriend
+                    btn = $('<button>', {
+                        class: 'btn btn-outline-danger',
+                        text: 'Unfriend',
+                        id: 'ua_uf' + result_id,
+                        onclick: 'unfriend(\'' + username + '\', ' + result_id + ')'
+                    });
+                    // append btn to ua
+                    $('#ua' + result_id).prepend(btn);
+                }
+            }
+        });
+    }
+    function new_message(username) {
+        $.ajax({
+            type: 'GET',
+            url: '{% url 'new_message' %}',
+            data: {
+                'new_message_username': username,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            dataType: 'json',
+        })
+            .done(function (data) {
+                // redirect to the new message page
+                window.location.href = data.redirect_url;
+            });
+    }
+{% endblock %}

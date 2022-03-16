@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}Social Network</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "css/fontawesome/all.min.css" %}">
+    {% block import_css %}
+    {% endblock %}
+</head>
+<body class="index-body">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'index' %}">Social Network</a>
+        <!-- Button to open the sidenav on small screens -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar links -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Centered search bar -->
+            <div class="d-flex ms-auto">
+                <form class="input-group" action="{% url 'search' %}">
+                    <!--input class="form-control" type="search" placeholder="Search" aria-label="Search"-->
+                    {{ search_form.q }}
+                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+            <!--- Right side of navbar -->
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a {% if active == "home" %}class="nav-link active" aria-current="page"
+                       {% else %}class="nav-link"{% endif %} href="{% url 'index' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a {% if active == "profile" %}class="nav-link active" aria-current="page"
+                       {% else %}class="nav-link"{% endif %} href="{% url 'profile' %}">Profile</a>
+                </li>
+                <!-- nav item with counter -->
+                <li class="nav-item">
+                    <a {% if active == "friends" %}class="nav-link active" aria-current="page"
+                       {% else %}class="nav-link"{% endif %} href="{% url 'friends' %}">Friends
+                        {% with request.user.profile.get_friends_request_count as req_count %}
+                            {% if req_count > 0 %}
+                                <span class="badge badge-pill badge-primary" data-toggle="tooltip"
+                                      data-placement="bottom" title="{{ req_count }} Friend Request{{ req_count|pluralize }}">
+                                    {{ req_count }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a {% if active == "messages" %}class="nav-link active" aria-current="page"
+                       {% else %}class="nav-link"{% endif %} href="{% url 'messages' %}">Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-toggle="tooltip" title="Settings" data-placement="bottom">
+                        <i class="fa-solid fa-gear"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}" data-toggle="tooltip" title="Logout" data-placement="bottom">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- left bar of the user home page -->
+        <div class="col-2 home-col"></div>
+        <!-- News Feed - Main content -->
+        <div class="col-8 home-col">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}"
+                         role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}
+            {% endblock %}
+        </div>
+        <!-- right bar of the user home page -->
+        <div class="col-2 home-col"></div>
+    </div>
+    <!-- Back to top -->
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <p class="text-center">
+                    <a href="#" class="text-muted">
+                        <i class="fa-solid fa-arrow-up"></i> Back to top
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static "js/jquery-3.6.0.min.js" %}"></script>
+<script src="{% static "js/bootstrap.bundle.js" %}"></script>
+<script src="{% static "js/popper.min.js" %}"></script>
+{% block import_script %}
+{% endblock %}
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            trigger: 'hover',
+            // get placement from tooltip data-placement attribute
+            placement: function (context, source) {
+                var placement = $(source).data('placement');
+                if (placement !== undefined) {
+                    return placement;
+                }
+                return 'top';
+            }
+        })
+    })
+    {% if messages %}
+        $(document).ready(function () {
+            window.setTimeout(function () {
+                $(".alert").fadeTo(1000, 0).slideUp(1000, function () {
+                    $(this).remove();
+                });
+            }, 5000);
+            if (window.location.hash) {
+                var hash = window.location.hash;
+                var pos = hash.substring(3, hash.length); //3 is used to remove "#sp" from hash name
+                if (!isNaN(pos))
+                    window.scrollTo(0, pos);
+            }
+        });
+    {% endif %}
+    {% block script %}
+    {% endblock %}
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+{% extends 'landing/base.html' %}
+
+{% block title %}
+    Social Network
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row index-row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-4">
+                <h1 class="fw-bold text-primary">
+                    social network
+                </h1>
+                <p class="index-p">
+                    the social network is a social networking site where users can share posts, photos, videos, and
+                    other content with each other.
+                </p>
+            </div>
+            <form class="col-md-4 text-center login-form p-4" method="post" action="{% url 'index' %}">
+                {% csrf_token %}
+                <h1 class="h3 mb-3 font-weight-normal">
+                    Log in
+                </h1>
+                <div class="form-floating mb-3">
+                    {{ login_form.email }}
+                    <label for="inputEmail">Email address</label>
+                </div>
+                <div class="form-floating">
+                    {{ login_form.password }}
+                    <label for="inputPassword">Password</label>
+                </div>
+                <div class="mb-3 py-2">
+                    <label class="checkbox">
+                        <input type="checkbox" value="remember-me">
+                        Remember me
+                    </label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block w-100 mb-2" type="submit" name="login">
+                    Log in
+                </button>
+                <!-- Forgot password -->
+                <a href="{% url 'forgot' %}" class="forgot-password">
+                    Forgot the password?
+                </a>
+                <hr>
+                <!-- Create New Account -->
+                <button class="btn btn-lg btn-block w-50 new-account" data-bs-toggle="modal"
+                        data-bs-target="#signupModal">
+                    Create New Account
+                </button>
+            </form>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </div>
+    <!-- Sign up form modal -->
+    <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title pb-0" id="signupModalLabel">
+                        <b>Sign up</b>
+                    </h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'index' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="row mb-3">
+                                <div class="col">
+                                    {{ signup_form.first_name }}
+                                </div>
+                                <div class="col">
+                                    {{ signup_form.last_name }}
+                                </div>
+                            </div>
+                            <div class="col mb-3 input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">@</div>
+                                </div>
+                                {{ signup_form.username }}
+                            </div>
+                            <div class="col mb-3">
+                                {{ signup_form.email }}
+                            </div>
+                            <div class="col mb-2">
+                                {{ signup_form.password }}
+                            </div>
+                            <!-- Date of birth -->
+                            <div class="row mb-3">
+                                <small class="mb-1">Date of birth</small>
+                                {{ signup_form.birth_date }}
+                            </div>
+                            <div class="row mb-3">
+                                <small class="mb-1">Gender</small>
+                                {% for pk, choice in signup_form.gender.field.widget.choices %}
+                                <div class="col-5 form-check form-check-inline ms-3">
+                                    <input id="id_{{signup_form.gender.name}}_{{ forloop.counter0 }}"
+                                           name="{{signup_form.gender.name}}" type="{{signup_form.gender.field.widget.input_type}}" value="{{pk}}"
+                                           class="form-check-input" required {% if signup_form.gender.data == pk.0 %}checked="checked"{% endif %}/>
+                                    <label for="id_{{signup_form.gender.name}}_{{ forloop.counter0 }}" class="form-check-label">{{ choice }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <!-- Sign up button -->
+                            <div class="col text-center">
+                                <button type="submit" class="btn btn-primary btn-block w-50 new-account" name="signup">
+                                    Sign up
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Sign up modal end -->
+{% endblock %}

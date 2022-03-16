@@ -1,0 +1,17 @@
+<div class="row align-items-center">
+    <div class="col-md-8 receivers-message offset-2">
+        <p>
+            {{ msg.content }}
+        </p>
+        <!-- Time info  -->
+        <small class="post-time text-muted pull-right" style="text-decoration: none;">
+            <i class="fa-solid fa-clock"></i> {{ msg.created_at|date:"d M Y H:i" }}
+        </small>
+    </div>
+    <div class="col-md-1">
+        <a href="{% url 'userprofile' user.username %}" data-toggle="tooltip" title="{{ user.get_full_name }}">
+            <img src="{{ user.profile.profile_pic.url }}" class="img-fluid rounded-circle sender-profile-picture"
+                 alt="Profile Photo">
+        </a>
+    </div>
+</div>

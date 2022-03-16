@@ -1,0 +1,95 @@
+{% extends 'landing/base.html' %}
+{% load validation_functions %}
+{% block title %}
+    Register
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+    <div class="row mt-5">
+        <h1 class="text-center fw-bold text-primary mb-3">Social Network</h1>
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h4 mb-0 fw-bold text-center">
+                        Create a new account
+                    </h1>
+                    <p class="text-muted text-center">
+                        It's free and always will be.
+                    </p>
+                    <hr>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="row mb-3">
+                                <div class="col">
+                                    {{ form.first_name }}
+                                </div>
+                                <div class="col">
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+                            <div class="col mb-3 input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">@</div>
+                                </div>
+                                {% if form.username.errors %}
+                                    {{ form.username|add_classes:'is-invalid' }}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.username.errors.0 }}
+                                    </div>
+                                {% else %}
+                                    {{ form.username }}
+                                {% endif %}
+                            </div>
+                            <div class="col mb-3">
+                                {% if form.email.errors %}
+                                    {{ form.email|add_classes:'is-invalid' }}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                {% else %}
+                                    {{ form.email }}
+                                {% endif %}
+                            </div>
+                            <div class="col mb-2">
+                                {{ form.password }}
+                            </div>
+                            <!-- Date of birth -->
+                            <div class="row mb-3">
+                                <small class="mb-1">Date of birth</small>
+                                {% if form.birth_date.errors %}
+                                    {{ form.birth_date|add_classes:'is-invalid' }}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.birth_date.errors.0 }}
+                                    </div>
+                                {% else %}
+                                    {{ form.birth_date }}
+                                {% endif %}
+                            </div>
+                            <div class="row mb-3">
+                                <small class="mb-1">Gender</small>
+                                {% for pk, choice in form.gender.field.widget.choices %}
+                                <div class="col-5 form-check form-check-inline ms-3">
+                                    <input id="id_{{form.gender.name}}_{{ forloop.counter0 }}"
+                                           name="{{form.gender.name}}" type="{{form.gender.field.widget.input_type}}" value="{{pk}}"
+                                           class="form-check-input" required {% if form.gender.data == pk.0 %}checked="checked"{% endif %}/>
+                                    <label for="id_{{form.gender.name}}_{{ forloop.counter0 }}" class="form-check-label">{{ choice }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <!-- Sign up button -->
+                            <div class="col text-center mb-2">
+                                <button type="submit" class="btn btn-primary btn-block w-50 new-account">Sign up</button>
+                            </div>
+                            <p class="text-center">
+                                <a href="{% url 'index' %}">Already have an account?</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

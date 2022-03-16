@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load post_functions %}
+{% block content %}
+    <!-- New post panel -->
+    <div class="panel-bg">
+        <form class="panel-body p-3" method="post" action="{% url 'index' %}">
+            {% csrf_token %}
+            {{ post_form.content }}
+            <div class="mt-3 clearfix">
+                <!-- Post button -->
+                <button class="btn btn-sm btn-primary fa-pull-right" type="submit" name="new_post">Post</button>
+                <!-- Visibility selection -->
+                {{ post_form.visibility }}
+                <!-- Post video -->
+                {{ post_form.attachment }}
+                <label for="attachment-select" class="my-btn" href="#" data-toggle="tooltip" title="Upload video"><i
+                        class="fa-solid fa-video"></i></label>
+                <!-- Post image -->
+                {{ post_form.attachment }}
+                <label for="attachment-select" class="my-btn" href="#" data-toggle="tooltip" title="Upload image"><i
+                        class="fa-solid fa-camera"></i></label>
+                <!-- Post file -->
+                {{ post_form.attachment }}
+                <label for="attachment-select" class="my-btn" href="#" data-toggle="tooltip"
+                       title="Upload document"><i
+                        class="fa-solid fa-file"></i></label>
+            </div>
+        </form>
+    </div>
+    <!--- Post -->
+    {% with request.user.profile.get_newsfeed as newsfeed %}
+    {% for post in newsfeed %}
+    <div class="panel-bg user-feed-panel" id="post_{{ post.pk }}">
+        <div class="row">
+            <!-- Poster's Profile Photo -->
+            <div class="col-1">
+                <a href="{% url 'userprofile' post.user.username %}" data-toggle="tooltip" title="{{ post.user.get_full_name }}">
+                    <img src="{{ post.user.profile.profile_pic.url }}"
+                         class="img-fluid rounded-circle img-thumbnail post-profile-photo"
+                         alt="Profile Photo">
+                </a>
+            </div>
+            <!-- Post body -->
+            <div class="col-11">
+                <div class="pb-3">
+                    <!-- Poster's Name -->
+                    <a href="{% url 'userprofile' post.user.username %}" class="text-dark username">{{ post.user.get_full_name }}</a>
+                    <!-- Post actions -->
+                    <div class="dropdown d-inline pull-right">
+                        <a class="text-muted" href="#" role="button" id="dropdownMenuLink{{ post.id }}"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-ellipsis-h" data-toggle="tooltip" title="More"></i>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ post.id }}">
+                            {% if post.user == request.user %}
+                                <li><a class="dropdown-item" href="{% url 'post_edit' post.pk %}">Edit</a></li>
+                                <li><button type="button" class="dropdown-item" onclick="post_delete({{ post.pk }})">Delete</button></li>
+                            {% else %}
+                                <li><button type="button" class="dropdown-item">Message</button></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <!-- Username -->
+                    <small>
+                        <a href="{% url 'userprofile' post.user.username %}" class="text-muted" style="text-decoration: none;">
+                            <i class="fa-light fa-at"></i>{{ post.user.username }}
+                        </a>
+                    </small>
+                    <br>
+                    <!-- Post date -->
+                    <small class="text-muted post-time">
+                        <a href="{% url 'post_detail' post.pk %}" class="text-dark" style="text-decoration: none;">
+                            <i class="fa-solid fa-clock"></i> {{ post.created_at|date:"d M Y, H:i" }}
+                        </a>
+                    </small>
+                </div>
+                <!-- Post image field -->
+                {% if post.attachment %}
+                    <div class="post-image-field">
+                        <img src="{{ post.attachment.url }}" class="img-fluid" alt="Post Image">
+                    </div>
+                {% endif %}
+                <!-- Post content -->
+                <p>
+                    {{ post.content }}
+                </p>
+                <!--- Post actions -->
+                <div class="row post-actions">
+                    <div class="col-4">
+                        {% is_liked post user as lkd %}
+                        {% is_disliked post user as dlkd %}
+                        <a id="post_like_a{{ post.id }}" href="javascript:post_like_dislike({{ post.id }},'like')" class="{% if lkd %}text-primary{% else %}text-muted{% endif %}" data-toggle="tooltip" title="Like">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                            <span id="like_count{{ post.id }}">
+                                {{ post.get_like_count }}
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a id="post_dislike_a{{ post.id }}" href="javascript:post_like_dislike({{ post.id }},'dislike')" class="{% if dlkd %}text-primary{% else %}text-muted{% endif %}" data-toggle="tooltip" title="Dislike">
+                            <i class="fa-solid fa-thumbs-down"></i>
+                            <span id="dislike_count{{ post.id }}">
+                                {{ post.get_dislike_count }}
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="{% url 'post_detail' post.pk %}#comment" class="text-muted" data-toggle="tooltip" title="Comment">
+                            <i class="fa-solid fa-comment"></i>
+                            <span>
+                                {{ post.get_comment_count }}
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {%  endwith %}
+    <!--- End of post -->
+    <!--- Empty newsfeed -->
+    {% if user.profile.get_post_count == 0 %}
+        {% include 'empty/empty_newsfeed.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    // Send ajax post request for post-delete
+    function post_delete(post_id) {
+        // Fade out the post slide up
+        $('#post_'+post_id).fadeOut(500);
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'index' %}',
+            data: {
+                'post_delete_id': post_id,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            dataType: 'json',
+        })
+    }
+    // Send ajax post request for post-like
+    function post_like_dislike(post_id, action) {
+        $.ajax({
+            type: 'POST',
+            url: '{% url 'index' %}',
+            data: {
+                'post_like_dislike_id': post_id,
+                'action': action,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            dataType: 'json',
+        })
+        .done(function(data) {
+            // data contains likes, dislikes, like_class, dislike_class
+            // Update the like/dislike count
+            $('#like_count'+post_id).text(data.likes);
+            $('#dislike_count'+post_id).text(data.dislikes);
+            // Update the like/dislike button
+            $('#post_like_a'+post_id).removeClass().addClass(data.like_class);
+            $('#post_dislike_a'+post_id).removeClass().addClass(data.dislike_class);
+        });
+    }
+{% endblock %}

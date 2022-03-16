@@ -1,0 +1,44 @@
+{% extends 'landing/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-5">
+        <h1 class="text-center fw-bold text-primary mb-3">Social Network</h1>
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <form class="card-body" method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <h1 class="h3 mb-3 font-weight-normal">
+                        Log in
+                    </h1>
+                    <div class="form-floating mb-3">
+                        {{ form.email }}
+                        <label for="inputEmail">Email address</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        {{ form.password }}
+                        <label for="inputPassword">Password</label>
+                    </div>
+                    <div class="form-check pull-right mb-3">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" value="">
+                            Remember me
+                        </label>
+                    </div>
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <button class="btn btn-lg btn-primary btn-block w-100 mb-2 fw-bold" type="submit" name="submit">
+                        Log in
+                    </button>
+                    <p class="text-center">
+                      <a href="{% url 'forgot' %}">Forgot Password?</a>
+                      <span class="text-muted">|</span>
+                      <a href="{% url 'signup' %}">Sign up to Social Network</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

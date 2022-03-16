@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load message_functions %}
+{% block content %}
+    {% if object.sender.username == request.user.username %}
+        <!-- Message header -->
+        <div class="message-panel">
+            <div class="row">
+                <div class="col-md-2">
+                    <a href="{% url 'userprofile' object.receiver.username %}" data-toggle="tooltip" title="{{ object.receiver.get_full_name }}">
+                        <img src="{{ object.receiver.profile.profile_pic.url }}" class="img-fluid rounded-circle sender-profile-picture"
+                             alt="Profile Photo">
+                    </a>
+                </div>
+                <div class="col-md-10">
+                    <div class="sender-details">
+                        <div>
+                            <a href="{% url 'userprofile' object.receiver.username %}" class="text-dark username">{{ object.receiver.get_full_name }}</a>
+                            <div class="dropdown d-inline pull-right">
+                                <a class="text-muted" href="#" role="button" id="dropdownMenuLink"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis-h" data-toggle="tooltip" title="More"></i>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <li><a id="delete_message" class="dropdown-item" href="javascript:delete_message({{ object.id }})">Delete Message</a></li>
+                                    <li><a class="dropdown-item disabled" href="#">Block User</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <small>
+                            <a href="{% url 'userprofile' object.receiver.username %}" class="text-muted" style="text-decoration: none;">
+                                <i class="fa-light fa-at"></i>{{ object.receiver.username }}
+                            </a>
+                        </small>
+                        {%  get_latest_message object.id as last_message %}
+                        <small class="text-muted post-time">
+                            <a href="#" class="text-dark" style="text-decoration: none;">
+                                <i class="fa-solid fa-clock"></i> {{ object.updated_at|date:"d M Y, H:i" }}
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Message content -->
+        <div class="message-panel">
+            {% get_all_messages message.id as all_messages%}
+            {% for msg in all_messages %}
+                {% if msg.from_user.lower == 'receiver' %}
+                    {% include 'message/sender.html' with message=msg user=object.receiver %}
+                {% else %}
+                    {% include 'message/receiver.html' with message=msg user=request.user %}
+                {% endif %}
+            {% empty %}
+                {% include 'message/empty.html' %}
+            {% endfor %}
+    {% else %}
+        <!-- Message header -->
+        <div class="message-panel">
+            <div class="row">
+                <div class="col-md-2">
+                    <a href="{% url 'userprofile' object.sender.username %}" data-toggle="tooltip" title="{{ object.sender.get_full_name }}">
+                        <img src="{{ object.sender.profile.profile_pic.url }}" class="img-fluid rounded-circle sender-profile-picture"
+                             alt="Profile Photo">
+                    </a>
+                </div>
+                <div class="col-md-10">
+                    <div class="sender-details">
+                        <div>
+                            <a href="{% url 'userprofile' object.sender.username %}" class="text-dark username">{{ object.sender.get_full_name }}</a>
+                            <div class="dropdown d-inline pull-right">
+                                <a class="text-muted" href="#" role="button" id="dropdownMenuLink"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis-h" data-toggle="tooltip" title="More"></i>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <li><a id="delete_message" class="dropdown-item" href="javascript:delete_message({{ object.id }})">Delete Message</a></li>
+                                    <li><a class="dropdown-item disabled" href="#">Block User</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <small>
+                            <a href="{% url 'userprofile' object.sender.username %}" class="text-muted" style="text-decoration: none;">
+                                <i class="fa-light fa-at"></i>{{ object.sender.username }}
+                            </a>
+                        </small>
+                        {%  get_latest_message object.id as last_message %}
+                        <small class="text-muted post-time">
+                            <a href="#" class="text-dark" style="text-decoration: none;">
+                                <i class="fa-solid fa-clock"></i> {{ object.updated_at|date:"d M Y, H:i" }}
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Message content -->
+        <div class="message-panel">
+            {% get_all_messages message.id as all_messages%}
+            {% for msg in all_messages %}
+                {% if msg.from_user.lower == 'sender' %}
+                    {% include 'message/sender.html' with message=msg user=object.sender %}
+                {% else %}
+                    {% include 'message/receiver.html' with message=msg user=request.user %}
+                {% endif %}
+            {% empty %}
+                {% include 'message/empty.html' %}
+            {% endfor %}
+    {% endif %}
+    <form class="row align-items-center" method="post" action="{% url 'message_detail' object.id %}">
+        {% csrf_token %}
+        <div class="col-1">
+            <a href="{% url 'userprofile' request.user.username %}" data-toggle="tooltip"
+               title="{{ request.user.get_full_name }}">
+                <img src="{{ request.user.profile.profile_pic.url }}"
+                     class="img-fluid rounded-circle sender-profile-picture"
+                     alt="Profile Photo">
+            </a>
+        </div>
+        <div class="col-10">
+            <div class="form-group">
+                {{ message_form.content }}
+            </div>
+        </div>
+        <div class="col-1">
+            <button name="send_message" type="submit" class="btn btn-primary btn-block">
+                Send <i class="fa-solid fa-paper-plane-top"></i>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block script %}
+    function delete_message(message_id) {
+        $.ajax({
+            url: "{% url 'message_detail' object.id %}",
+            type: "POST",
+            data: {
+                'action': 'delete_message',
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                message_id: message_id
+            },
+            success: function (data) {
+                if (data.status === 'success') {
+                    window.location.href = "{% url 'messages' %}";
+                }
+            }
+        });
+    }
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load message_functions %}
+
+{% block title %}
+    Messages |
+{% endblock %}
+
+{% block content %}
+    <div class="message-panel">
+        <!-- Panel Header -->
+        <div class="panel-header">
+            <h3>Messages</h3>
+            <hr>
+        </div>
+        <!-- Panel Body -->
+        {% for message in object_list %}
+            {% if message.sender.username == request.user.username %}
+                <div class="row align-items-center" id="message_row{{ message.id }}">
+                    <div class="col-md-2">
+                        <a href="{% url 'userprofile' message.receiver.username %}" data-toggle="tooltip"
+                           title="{{ message.receiver.get_full_name }}">
+                            <img src="{{ message.receiver.profile.profile_pic.url }}"
+                                 class="img-fluid rounded-circle sender-profile-picture"
+                                 alt="Profile Photo">
+                        </a>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <!-- Sender details -->
+                            <div class="col-md-12">
+                                <div class="pb-3">
+                                    <a href="{% url 'userprofile' message.receiver.username %}" class="text-dark username">{{ message.receiver.get_full_name }}</a>
+                                    {% is_latest_read message.id as is_read %}
+                                    <div class="dropdown d-inline pull-right">
+                                        <a class="text-muted" href="#" role="button" id="dropdownMenuLink{{ message.id }}"
+                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa-solid fa-ellipsis-h" data-toggle="tooltip" title="More"></i>
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ message.id }}">
+                                            <li><a class="dropdown-item" href="javascript:delete_message({{ message.id }})">Delete Message</a></li>
+                                            {% if not is_read %}
+                                                <li id="mark_read_button{{ message.id }}"><a class="dropdown-item" href="javascript:mark_read({{ message.id }})">Mark as Read</a></li>
+                                            {% endif %}
+                                            <li><a class="dropdown-item disabled" href="#">Block User</a></li>
+                                        </ul>
+                                    </div>
+                                    {% if not is_read %}
+                                        <i id="unread_sign{{ message.id }}" class="fa-solid fa-comment text-primary pull-right" data-toggle="tooltip" title="Unread Message"></i>
+                                    {% endif %}
+                                    <small>
+                                        <a href="{% url 'userprofile' message.receiver.username %}" class="text-muted" style="text-decoration: none;">
+                                            <i class="fa-light fa-at"></i>{{ message.receiver.username }}
+                                        </a>
+                                    </small>
+                                    <br>
+                                    <small class="text-muted post-time">
+                                        <a href="#" class="text-dark" style="text-decoration: none;">
+                                            <i class="fa-solid fa-clock"></i> {{ message.updated_at|date:"d M Y, H:i" }}
+                                        </a>
+                                    </small>
+                                </div>
+                            </div>
+                            <!-- Message content -->
+                            <div class="col-md-12">
+                                <p>
+                                    {% get_latest_message message.id as last_message%}
+                                    {{ last_message|truncatewords:20 }}
+                                </p>
+                            </div>
+                            <!-- Read more -->
+                            <div class="col-md-12">
+                                <a href="{% url 'message_detail' message.id %}" class="text-muted message-more">
+                                    <i class="fa-light fa-arrow-right me-1"></i>Read more
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% elif message.receiver.username == request.user.username  %}
+                <div class="row align-items-center" id="message_row{{ message.id }}">
+                    <div class="col-md-2">
+                        <a href="{% url 'userprofile' message.sender.username %}" data-toggle="tooltip" title="{{ message.sender.get_full_name }}">
+                            <img src="{{ message.sender.profile.profile_pic.url }}" class="img-fluid rounded-circle sender-profile-picture"
+                                 alt="Profile Photo">
+                        </a>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <!-- Sender details -->
+                            <div class="col-md-12">
+                                <div class="pb-3">
+                                    <a href="{% url 'userprofile' message.sender.username %}" class="text-dark username">{{ message.sender.get_full_name }}</a>
+                                    {% is_latest_read message.id as is_read %}
+                                    <div class="dropdown d-inline pull-right">
+                                        <a class="text-muted" href="#" role="button" id="dropdownMenuLink{{ message.id }}"
+                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa-solid fa-ellipsis-h" data-toggle="tooltip" title="More"></i>
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ message.id }}">
+                                            <li><a class="dropdown-item" href="javascript:delete_message({{ message.id }})">Delete Message</a></li>
+                                            {% if not is_read %}
+                                                <li id="mark_read_button{{ message.id }}"><a class="dropdown-item" href="javascript:mark_read({{ message.id }})">Mark as Read</a></li>
+                                            {% endif %}
+                                            <li><a class="dropdown-item disabled" href="#">Block User</a></li>
+                                        </ul>
+                                    </div>
+                                    {% if not is_read %}
+                                        <i id="unread_sign{{ message.id }}" class="fa-solid fa-comment text-primary pull-right" data-toggle="tooltip" title="Unread Message"></i>
+                                    {% endif %}
+                                    <small>
+                                        <a href="{% url 'userprofile' message.sender.username %}" class="text-muted" style="text-decoration: none;">
+                                            <i class="fa-light fa-at"></i>{{ message.sender.username }}
+                                        </a>
+                                    </small>
+                                    <br>
+                                    <small class="text-muted post-time">
+                                        <a href="#" class="text-dark" style="text-decoration: none;">
+                                            <i class="fa-solid fa-clock"></i> {{ message.updated_at|date:"d M Y, H:i" }}
+                                        </a>
+                                    </small>
+                                </div>
+                            </div>
+                            <!-- Message content -->
+                            <div class="col-md-12">
+                                <p>
+                                    {% get_latest_message message.id as last_message%}
+                                    {{ last_message|truncatewords:20 }}
+                                </p>
+                            </div>
+                            <!-- Read more -->
+                            <div class="col-md-12">
+                                <a href="{% url 'message_detail' message.id %}" class="text-muted message-more">
+                                    <i class="fa-light fa-arrow-right me-1"></i>Read more
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% empty %}
+            {% include 'empty/empty_message.html' %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block script %}
+    function mark_read(message_id) {
+        $.ajax({
+            url: "{% url 'messages' %}",
+            type: "POST",
+            data: {
+                'action': 'mark_read',
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                message_id: message_id
+            },
+            success: function (data) {
+                if (data.status == 'success') {
+                    $('#mark_read_button' + message_id).remove()
+                    $('#unread_sign' + message_id).remove()
+                }
+            }
+        });
+    }
+    // delete message
+    function delete_message(message_id) {
+        $.ajax({
+            url: "{% url 'messages' %}",
+            type: "POST",
+            data: {
+                'action': 'delete_message',
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                message_id: message_id
+            },
+            success: function (data) {
+                if (data.status == 'success') {
+                    $('#message_row' + message_id).remove()
+                }
+            }
+        });
+    }
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load post_functions %}
+
+{% block title %}
+    Post Detail |
+{% endblock %}
+
+{% block content %}
+    <!-- Post -->
+    <div class="panel-bg user-feed-panel">
+        <div class="row">
+            <!-- Left side of the post - Profile Photo -->
+            <div class="col-1">
+                <a href="{% url 'userprofile' post.user.username %}" data-toggle="tooltip" title="{{ post.user.get_full_name }}">
+                    <img src="{{ post.user.profile.profile_pic.url }}"
+                         class="img-fluid rounded-circle img-thumbnail post-profile-photo"
+                         alt="Profile Photo">
+                </a>
+            </div>
+            <!-- Post body -->
+            <div class="col-11">
+                <div class="pb-3">
+                    <!-- Post header -->
+                    <!-- Name -->
+                    <a href="{% url 'userprofile' post.user.username %}" class="text-dark username">{{ post.user.get_full_name }}</a>
+                    <!-- Post actions -->
+                    <div class="dropdown d-inline pull-right">
+                        <a class="text-muted" href="#" role="button" id="dropdownMenuLink{{ post.id }}"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-ellipsis-h" data-toggle="tooltip" title="More"></i>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ post.id }}">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </div>
+                    <!-- Username -->
+                    <small>
+                        <a href="{% url 'userprofile' post.user.username %}" class="text-muted" style="text-decoration: none;">
+                            <i class="fa-light fa-at"></i>{{ post.user.username }}
+                        </a>
+                    </small>
+                    <br>
+                    <!-- Post date -->
+                    <small class="text-muted post-time">
+                        <a href="#" class="text-dark" style="text-decoration: none;">
+                            <i class="fa-solid fa-clock"></i> {{ post.created_at|date:"d M Y, H:i" }}
+                        </a>
+                    </small>
+                </div>
+                <!-- Post image field -->
+                {% if post.attachment %}
+                    <div class="post-image-field">
+                        <img src="{{ post.attachment.url }}" class="img-fluid" alt="Post Image">
+                    </div>
+                {% endif %}
+                <!-- Post content -->
+                <p>
+                    {{ post.content }}
+                </p>
+                <!--- Post actions -->
+                <div class="row post-actions">
+                    <div class="col-4">
+                        {% is_liked post user as lkd %}
+                        <a href="#" class="{% if lkd %}text-primary{% else %}text-muted{% endif %}" data-toggle="tooltip" title="Like">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                            <span>
+                                {{ post.get_like_count }}
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        {% is_disliked post user as dlkd %}
+                        <a href="#" class="{% if dlkd %}text-primary{% else %}text-muted{% endif %}" data-toggle="tooltip" title="Dislike">
+                            <i class="fa-solid fa-thumbs-down"></i>
+                            <span>
+                                {{ post.get_dislike_count }}
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" class="text-muted" data-toggle="tooltip" title="Comment">
+                            <i class="fa-solid fa-comment"></i>
+                            <span>
+                                {{ post.get_comment_count }}
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Comments -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Comments</h4>
+        </div>
+        {% for comment in post.get_comments %}
+        <div class="card-body">
+            <div class="row">
+                <div class="col-1">
+                    <a href="{% url 'userprofile' comment.user.username %}" data-toggle="tooltip" title="{{ comment.user.profile.get_full_name }}">
+                        <img src="{{ comment.user.profile.profile_pic.url }}"
+                             class="img-fluid rounded-circle img-thumbnail post-profile-photo"
+                             alt="Profile Photo">
+                    </a>
+                </div>
+                <div class="col-11">
+                    <a href="{% url 'userprofile' comment.user.username %}" class="text-dark username">{{ comment.user.profile.get_full_name }}</a>
+                    <div class="dropdown d-inline pull-right">
+                        <a class="text-muted" href="#" role="button" id="dropdownMenuLink{{ comment.pk }}"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-ellipsis-h" data-toggle="tooltip" title="More"></i>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ comment.pk }}">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </div>
+                    <small>
+                        <a href="{% url 'userprofile' comment.user.username %}" class="text-muted" style="text-decoration: none;">
+                            <i class="fa-light fa-at"></i> {{ comment.user.username }}
+                        </a>
+                    </small>
+                    <br>
+                    <small class="text-muted post-time">
+                        <a href="#" class="text-dark" style="text-decoration: none;">
+                            <i class="fa-solid fa-clock"></i> {{ comment.created_at|date:"d M Y, H:i" }}
+                        </a>
+                    </small>
+                    <p>
+                        {{ comment.content }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- No Comments -->
+        <div class="card-body">
+            <div class="col-12 text-center">
+                <h4>
+                    <i class="fa-light fa-comment-slash"></i>
+                </h4>
+                <h4 class="text-muted">
+                    No comments yet
+                </h4>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- Add Comment -->
+        <div class="card-body">
+            <hr>
+            <div class="row">
+                <h4 class="col-12">
+                    Add Comment
+                </h4>
+            </div>
+            <div id="comment" class="row">
+                <div class="col-12">
+                    <form method="post" action="{% url 'post_detail' post.pk %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ comment_form.content }}
+                        </div>
+                        <div class="form-group pull-right mt-3">
+                            <button name="new_comment" type="submit" class="btn btn-primary">
+                                Add Comment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

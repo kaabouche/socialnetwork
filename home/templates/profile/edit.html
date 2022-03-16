@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Edit Profile |
+{% endblock %}
+{% block import_css %}
+    <link rel="stylesheet" href="{% static "css/countrySelect.css" %}">
+    <link rel="stylesheet" href="{% static "css/intlTelInput.css" %}">
+{% endblock %}
+{% block content %}
+    <form method="post" action="{% url 'edit_profile' request.user.username %}">
+    {% csrf_token %}
+        <div class="profile-panel">
+            <div class="container-fluid position-relative profile-cover">
+                <!-- Profile Cover -->
+                <div class="position-relative">
+                    <div class="profile-cover-bg"
+                         style="background-image: url('{{ request.user.profile.cover_pic.url }}')"></div>
+                    <div class="profile-cover-buttons">
+                        <button type="submit" class="btn btn-outline-light" data-toggle="tooltip" title="Done Editing">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Profile Picture -->
+                <div class="profile-picture">
+                    <img src="{{ request.user.profile.profile_pic.url }}" alt="profile">
+                </div>
+            </div>
+            <div class="d-xl-none" style="padding-top: 4rem;"></div>
+            <!-- Profile Info -->
+            <div class="profile-info">
+                <div class="profile-info-name">
+                    <div class="input-group w-25 m-auto pb-2">
+                        {{ user_form.first_name }}
+                        {{ user_form.last_name }}
+                    </div>
+                    <p><i class="fa-light fa-at"></i>{{ request.user.username }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="panel-bg about-panel">
+            <h4 class="panel-title">About</h4>
+            <hr>
+            <!-- Basic info -->
+            <div class="about-info-panel row">
+                <div class="col-3">
+                    Basic info
+                </div>
+                <div class="col-9">
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Gender</div>
+                        <div class="col-9">
+                            {{ profile_form.gender }}
+                        </div>
+                    </div>
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Date of birth</div>
+                        <div class="col-9">
+                            {{ profile_form.birth_date }}
+                        </div>
+                    </div>
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Family</div>
+                        <div class="col-9">
+                            {{ profile_form.family }}
+                            <small class="text-muted">Separate each member with a semicolon (;)</small>
+                        </div>
+                    </div>
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Current City</div>
+                        <div class="col-9">
+                            {{ profile_form.current_city }}
+                        </div>
+                    </div>
+                    <div class="row text-muted">
+                        <div class="col-3">Hometown</div>
+                        <div class="col-9">
+                            {{ profile_form.hometown }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <!-- Contact info -->
+            <div class="about-info-panel row">
+                <div class="col-3">
+                    Contact info
+                </div>
+                <div class="col-9">
+                    <div class="row text-muted mb-3">
+                        <div class="col-3">Email</div>
+                        <div class="col-9">
+                            <a href="#">
+                                <i class="fa-regular fa-envelope"></i>
+                                <span>{{ request.user.email }}</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Phone</div>
+                        <div class="col-9">
+                            {{ profile_form.phone_number }}
+                        </div>
+                    </div>
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Website</div>
+                        <div class="col-9">
+                            {{ profile_form.website }}
+                        </div>
+                    </div>
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Address</div>
+                        <div class="col-9">
+                            {{ profile_form.address }}
+                        </div>
+                    </div>
+                    <div class="row text-muted mb-2">
+                        <div class="col-3">Country</div>
+                        <div class="col-9">
+                            {{ profile_form.country }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <!-- Bio -->
+            <div class="about-info-panel row">
+                <div class="col-3">
+                    Bio
+                </div>
+                <div class="col-8">
+                    {{ profile_form.bio }}
+                    <small id="bio-text-count" class="pull-right">
+                        <span id="current_count">{{ profile_form.bio.value|length }}</span>
+                        <span id="maximum_count">/ 500</span>
+                    </small>
+                </div>
+            </div>
+            <hr>
+            <!-- Education & Work -->
+            <h4 class="mb-3">Education & Work</h4>
+            <hr>
+            <!-- Education -->
+            <div class="about-info-panel row">
+                <div class="col-3">
+                    Education
+                </div>
+                <div class="col-8">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row mb-2">
+                                <div class="col-3">
+                                    University
+                                </div>
+                                <div class="col-9">
+                                    {{ profile_form.university }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-3">
+                                    Major
+                                </div>
+                                <div class="col-9">
+                                    {{ profile_form.major }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    GPA
+                                </div>
+                                <div class="col-9">
+                                    {{ profile_form.gpa }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Work -->
+            <div class="about-info-panel row">
+                <div class="col-3">
+                    Work
+                </div>
+                <div class="col-8">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row mb-2">
+                                <div class="col-3">
+                                    Company
+                                </div>
+                                <div class="col-9">
+                                    {{ profile_form.company }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-3">
+                                    Position
+                                </div>
+                                <div class="col-9">
+                                    {{ profile_form.position }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    Duration
+                                </div>
+                                <div id="work-date-pick" class="col-9 input-group w-50 align-middle">
+                                    {{ profile_form.duration_start }}
+                                    {{ profile_form.duration_end }}
+                                    <label for="present-work" class="form-control-label m-auto ps-2">
+                                        {{ profile_form.duration_current }}
+                                        Present
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+{% block import_script %}
+    <script src="{% static "js/countrySelect.js" %}"></script>
+    <script src="{% static "js/tel/intlTelInput.js" %}"></script>
+    <script src="{% static "js/tel/jquery-input-mask-phone-number.js" %}"></script>
+{% endblock %}
+{% block script %}
+    $("#country_selector").countrySelect({
+
+    defaultCountry: "us",
+    });
+    var input = document.querySelector("#phone");
+    window.intlTelInput(input, {
+    utilsScript: "js/utils.js",
+    initialCountry: "us",
+    autoPlaceholder: "polite",
+    separateDialCode: true,
+    geoIpLookup: function (callback) {
+    $.get("https://ipinfo.io", function () {
+    }, "jsonp").always(function (resp) {
+    var countryCode = (resp && resp.country) ? resp.country : "";
+    callback(countryCode);
+    });
+    },
+    });
+    $(function(){
+    $('#phone').usPhoneFormat({
+    format: '(xxx) xxx-xxxx',
+    formatOnDisplay: true,
+    });
+    });
+    document.getElementById("done-edit").onclick = function () {
+    location.href = "profile.html";
+    };
+    function hideEndInput(checkbox) {
+    if (checkbox.checked) {
+    document.getElementById("end-date").style.display = "none";
+    } else {
+    document.getElementById("end-date").style.display = "block";
+    }
+    }
+{% endblock %}

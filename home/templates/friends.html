@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load post_functions %}
+
+{% block title %}
+    Friends |
+{% endblock %}
+
+{% block content %}
+    <div class="profile-panel">
+        <div class="container-fluid position-relative profile-cover">
+            <!-- Profile Cover -->
+            <div class="position-relative">
+                <div class="profile-cover-bg" style="background-image: url('{{ user.profile.cover_pic.url }}')"></div>
+            </div>
+            <!-- Profile Picture -->
+            <div class="profile-picture">
+                <img src="{{ request.user.profile.profile_pic.url }}" alt="profile">
+            </div>
+        </div>
+        <div class="d-xl-none" style="padding-top: 4rem;"></div>
+        <!-- Profile Info -->
+        <div class="profile-info">
+            <div class="profile-info-name">
+                <h1>{{ request.user.profile.get_full_name }}</h1>
+                <p><i class="fa-light fa-at"></i>{{ request.user.username }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Friends List -->
+        <div class="friend-list col-7">
+                <div class="friend-list-item">
+                    <div class="row panel-title mb-2">
+                        <h3>
+                            Friends
+                        </h3>
+                        <hr>
+                    </div>
+                    {% for friend in friends %}
+                        <div id="friend_list" class="row">
+                        <div class="friend-list-item-img col-sm-2 d-none d-lg-block">
+                            <a href="{% url 'userprofile' friend.user.username %}">
+                                <img src="{{ friend.profile_pic.url }}" alt="friend">
+                            </a>
+                        </div>
+                        <div class="friend-list-item-info col-sm-5">
+                            <a href="{% url 'userprofile' friend.user.username %}" class="text-body no-decoration">
+                                <h4>{{ friend.get_full_name }}</h4>
+                            </a>
+                            <a href="{% url 'userprofile' friend.user.username %}" class="text-muted no-decoration">
+                                <small><i class="fa-light fa-at"></i>{{ friend.user.username }}</small>
+                            </a>
+                            <p>{{ friend.get_friends_count }} Friend{{ friend.get_friends_count|pluralize }}</p>
+                        </div>
+                        <div class="dropdown friend-list-item-action col-sm-5 d-none d-md-block d-lg-none">
+                            <button class="btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton{{ friend.user.id }}"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-light fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ friend.user.id }}">
+                                <li><a class="dropdown-item" href="javascript:new_message('{{ friend.user.username }}')">Message</a></li>
+                                <li><a class="dropdown-item" href="javascript:unfriend('{{ friend.user.username }}')">Unfriend</a></li>
+                            </ul>
+                        </div>
+                        <div class="friend-list-item-action col-sm-5 d-md-none d-lg-block">
+                            <button class="btn btn-outline-dark mb-2" onclick="new_message('{{ friend.user.username }}')">Message</button>
+                            <button class="btn btn-outline-danger mb-2" onclick="unfriend('{{ friend.user.username }}')">Unfriend</button>
+                        </div>
+                    </div>
+                    {% empty %}
+                        {% include 'empty/empty_friends.html' %}
+                    {% endfor %}
+                </div>
+        </div>
+        <!-- Friend Requests -->
+        <div class="friend-list col-5">
+            <div class="friend-list-item">
+                <div class="row panel-title mb-2">
+                    <h3>
+                        Friend Requests
+                    </h3>
+                    <hr>
+                </div>
+                {% for friend_request in friend_requests %}
+                    <div class="row" id="friend_request_list">
+                        <div class="friend-list-item-img col-2 d-none d-xl-block">
+                            <a href="{% url 'userprofile' friend_request.sender_user.username %}">
+                                <img src="{{ friend_request.sender_user.profile.profile_pic.url }}" alt="friend">
+                            </a>
+                        </div>
+                        <div class="friend-list-item-info col-5">
+                            <a href="{% url 'userprofile' friend_request.sender_user.username %}" class="text-body no-decoration">
+                                <h4>{{ friend_request.sender_user.profile.get_full_name }}</h4>
+                            </a>
+                            <a href="{% url 'userprofile' friend_request.sender_user.username %}" class="text-body no-decoration">
+                                <small><i class="fa-light fa-at"></i>{{ friend_request.sender_user.username }}</small>
+                            </a>
+                            <p>{{ friend_request.sender_user.profile.get_friends_count }} Friend{{ friend_request.sender_user.profile.get_friends_count|pluralize }}</p>
+                        </div>
+                        <div class="dropdown friend-list-item-action col-sm-5 d-none d-md-block d-lg-none">
+                            <button class="btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton{{ friend_request.id }}"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-light fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ friend_request.id }}">
+                                <li><a class="dropdown-item" href="javascript:acceptFriendRequest({{ friend_request.id }})">Accept</a></li>
+                                <li><a class="dropdown-item" href="javascript:rejectFriendRequest({{ friend_request.id }})">Reject</a></li>
+                            </ul>
+                        </div>
+                        <div class="friend-list-item-action col-sm-5 d-md-none d-lg-block">
+                            <button class="btn btn-outline-primary mb-2" onclick="acceptFriendRequest({{ friend_request.id }})">Accept</button>
+                            <button class="btn btn-outline-danger mb-2" onclick="rejectFriendRequest({{ friend_request.id }})">Reject</button>
+                        </div>
+                    </div>
+                {% empty %}
+                    {% include "empty/empty_requests.html" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    function acceptFriendRequest(friend_request_id) {
+        $.ajax({
+            url: '{% url 'friends' %}',
+            type: 'POST',
+            data: {
+                'friend_request_id': friend_request_id,
+                'action': 'accept',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.status == 'accepted') {
+                    $('#friend-request-' + friend_request_id).remove();
+                    location.reload();
+                }
+            }
+        });
+    }
+    function rejectFriendRequest(friend_request_id) {
+        $.ajax({
+            url: '{% url 'friends' %}',
+            type: 'POST',
+            data: {
+                'friend_request_id': friend_request_id,
+                'action': 'reject',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.status == 'rejected') {
+                    $('#friend-request-' + friend_request_id).remove();
+                }
+                // refresh friend_request_list div
+                $('#friend_request_list').load(location.href + ' #friend_request_list');
+                location.reload();
+            }
+        });
+    }
+    // unfriend
+    function unfriend(username) {
+        $.ajax({
+            url: '{% url 'friends' %}',
+            type: 'POST',
+            data: {
+                'username': username,
+                'action': 'unfriend',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.status == 'unfriended') {
+                    $('#friend-' + username).remove();
+                }
+                // refresh friend_list div
+                $('#friend_list').load(location.href + ' #friend_list');
+                location.reload();
+            }
+        });
+    }
+    function new_message(username) {
+        $.ajax({
+            type: 'GET',
+            url: '{% url 'new_message' %}',
+            data: {
+                'new_message_username': username,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            dataType: 'json',
+        })
+            .done(function (data) {
+                // redirect to the new message page
+                window.location.href = data.redirect_url;
+            });
+    }
+{% endblock %}
